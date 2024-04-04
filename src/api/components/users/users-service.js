@@ -49,6 +49,11 @@ async function getUser(id) {
  * @returns {boolean}
  */
 async function createUser(name, email, password) {
+  //Check if email already exist
+  const emailExists = await checkExistingEmail(email);
+  if (emailExists) {
+    return false; // Email already exists, return false
+  }
   // Hash password
   const hashedPassword = await hashPassword(password);
 

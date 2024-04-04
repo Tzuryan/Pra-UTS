@@ -54,6 +54,16 @@ async function updateUser(id, name, email) {
 }
 
 /**
+ * Update existing user
+ * @param {string} email - Email
+ * @returns {Promise<boolean>}
+ */
+async function checkExistingUserByEmail(email) {
+  const existingUser = await User.findOne([email]);
+  return !!existingUser;
+}
+
+/**
  * Delete a user
  * @param {string} id - User ID
  * @returns {Promise}
@@ -68,4 +78,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  checkExistingUserByEmail,
 };
