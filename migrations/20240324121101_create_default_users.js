@@ -7,7 +7,7 @@ const email = 'admin@example.com';
 const password = '123456';
 
 logger.info('Creating default users');
-
+//test repositori
 (async () => {
   try {
     const numUsers = await User.countDocuments({
