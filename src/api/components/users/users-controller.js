@@ -46,10 +46,18 @@ async function getUser(request, response, next) {
  * @returns {object} Response object or pass an error to the next route
  */
 async function createUser(request, response, next) {
-  try {
+  try { 
     const name = request.body.name;
     const email = request.body.email;
     const password = request.body.password;
+    const emaildah = await usersService.emailTaken(email);
+    if (emaildah){
+      throw errorResponder(
+        errorTypes.EMAIL_ALREADY_TAKEN,
+        'Yeehh Email dah ada yang pake Brok'
+      );
+    }
+    
 
     const success = await usersService.createUser(name, email, password);
     if (!success) {
@@ -64,7 +72,6 @@ async function createUser(request, response, next) {
     return next(error);
   }
 }
-
 /**
  * Handle update user request
  * @param {object} request - Express request object
@@ -91,6 +98,7 @@ async function updateUser(request, response, next) {
     return next(error);
   }
 }
+
 
 /**
  * Handle delete user request
