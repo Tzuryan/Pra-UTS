@@ -61,14 +61,13 @@ async function updateUser(id, name, email) {
 async function deleteUser(id) {
   return User.deleteOne({ _id: id });
 }
-
-async function emailTaken(email){
+async function isEmailTaken(email) {
   const user = await User.findOne({ email });
   return user;
 }
 
-async function updatePassword(id,newpassword){
-  return user.updateOne({ _id: id},{password : newpassword});
+async function updatePassword(userId, newPassword) {
+  return User.updateOne({ _id: userId }, { password: newPassword });
 }
 
 module.exports = {
@@ -77,6 +76,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
-  emailTaken,
+  isEmailTaken,
   updatePassword,
 };

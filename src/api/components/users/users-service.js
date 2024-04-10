@@ -1,6 +1,7 @@
 const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
 
+
 /**
  * Get list of users
  * @returns {Array}
@@ -69,7 +70,7 @@ async function createUser(name, email, password) {
  * @returns {boolean}
  */
 async function updateUser(id, name, email) {
-  const user = await usersRepository.getUser(id);
+  const user = await usersRepository. getUsers(id);
 
   // User not found
   if (!user) {
@@ -107,27 +108,33 @@ async function deleteUser(id) {
   return true;
 }
 
-async function emailTaken(email) {
-  return await usersRepository.emailTaken(email);
-}
+// In user-service.js
 
-async function changePassword(userId,password_lama,password_baru,password_confirm) {
+
+async function isEmailTaken(email) {
+  return await usersRepository.isEmailTaken(email);
+}
+async function changePassword(userId, oldPassword, newPassword, newPasswordConfirm) {
   const user = await usersRepository.getUser(userId);
-  if(!user){
-    throw new Error('User Tidak Ditemukan');
+  if (!user) {
+    throw new Error('User not found');
   }
-  const passwordCocok = await passwordMatched(password_lama,user.password);
-  if(!passwordCocok){
-    throw new Error('Password Tidak Sesuai');
+
+  const PasswordMatched = await passwordMatched(oldPassword, user.password);
+  if (!PasswordMatched) {
+    throw new Error('Invalid old password');
   }
-  if(password_baru !== password_confirm){
-    throw new Error('Password Tidak Sama ');
+
+  if (newPassword !== newPasswordConfirm) {
+    throw new Error('New password and confirmation tidak sama');
   }
-  if(password_baru.length < 6 || password_baru.length > 32){
-    throw new Error('Panjang Password tidak sesuai');
+
+  if (newPassword.length < 6 || newPassword.length > 32) {
+    throw new Error('New password length must be between 6 and 32 characters');
   }
-  const hashedPasswordBaru = await hashPassword(password_baru);
-  await usersRepository.updatePassword(userId,hashedPasswordBaru);
+
+  const hashedNewPassword = await hashPassword(newPassword);
+  await usersRepository.updatePassword(userId, hashedNewPassword);
 }
 
 module.exports = {
@@ -136,6 +143,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
-  emailTaken,
+  isEmailTaken,
   changePassword,
 };

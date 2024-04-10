@@ -46,28 +46,27 @@ async function getUser(request, response, next) {
  * @returns {object} Response object or pass an error to the next route
  */
 async function createUser(request, response, next) {
-  try { 
+  try {
     const name = request.body.name;
     const email = request.body.email;
     const password = request.body.password;
     const password_confirm = request.body.password_confirm;
-    const emaildah = await usersService.emailTaken(email);
     
-    if (password !==password_confirm ){
+    const emailSudahada = await usersService.isEmailTaken(email);
+    if (emailSudahada) {
       throw errorResponder(
-        errorTypes.INVALID_PASSWORD,
-        'Yeehh Coba lu liat lagi pass lu brok'
+        errorTypes.EMAIL_ALREADY_TAKEN,
+        'Email already taken'
       );
     }
 
-    
-    if (emaildah){
+    if (password !== password_confirm) {
       throw errorResponder(
-        errorTypes.EMAIL_ALREADY_TAKEN,
-        'Yeehh Email dah ada yang pake Brok'
+        errorTypes.INVALID_PASSWORD,
+        'Password Confirmation Wrong'
       );
     }
-    
+
     const success = await usersService.createUser(name, email, password);
     if (!success) {
       throw errorResponder(
@@ -81,6 +80,7 @@ async function createUser(request, response, next) {
     return next(error);
   }
 }
+
 /**
  * Handle update user request
  * @param {object} request - Express request object
@@ -108,7 +108,6 @@ async function updateUser(request, response, next) {
   }
 }
 
-
 /**
  * Handle delete user request
  * @param {object} request - Express request object
@@ -133,26 +132,30 @@ async function deleteUser(request, response, next) {
     return next(error);
   }
 }
-
 async function changePassword(request, response, next) {
   try {
-    const id = request.params.id;
-    const password_baru = request.body.password_baru;
-    const password_lama = request.body.password_lama;
-    const password_confirm = request.body.password_confirm;
-    if (password_baru !==password_confirm ){
+    const userId = request.params.id;
+    const { oldPassword, newPassword, newPasswordConfirm } = request.body;
+
+    if (newPassword !== newPasswordConfirm) {
       throw errorResponder(
         errorTypes.INVALID_PASSWORD,
-        'Coba cek lagi bener apa ngk :)'
+        'Password Confirmation Wrong'
       );
     }
+
     await usersService.changePassword(
-      id,
-      password_baru,
-      password_lama,
-      password_confirm
+      userId,
+      oldPassword,
+      newPassword,
+      newPasswordConfirm
     );
-    return response.status(200).json({ message : 'Password Dah bisa dirubah yeyy' });
+
+    
+
+    return response
+      .status(200)
+      .json({ message: 'Password changed successfully' });
   } catch (error) {
     return next(error);
   }
