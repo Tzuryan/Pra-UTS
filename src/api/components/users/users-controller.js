@@ -50,10 +50,10 @@ async function createUser(request, response, next) {
     const name = request.body.name;
     const email = request.body.email;
     const password = request.body.password;
-    const confirmpassword = request.body.confirmpassword;
+    const password_confirm = request.body.password_confirm;
     const emaildah = await usersService.emailTaken(email);
     
-    if (password !== confirmpassword){
+    if (password !==password_confirm ){
       throw errorResponder(
         errorTypes.INVALID_PASSWORD,
         'Yeehh Coba lu liat lagi pass lu brok'
@@ -134,10 +134,34 @@ async function deleteUser(request, response, next) {
   }
 }
 
+async function changePassword(request, response, next) {
+  try {
+    const id = request.params.id;
+    const password_baru = request.body.password_baru;
+    const password_lama = request.body.password_lama;
+    const password_confirm = request.body.password_confirm;
+    if (password_baru !==password_confirm ){
+      throw errorResponder(
+        errorTypes.INVALID_PASSWORD,
+        'Coba cek lagi bener apa ngk :)'
+      );
+    }
+    await usersService.changePassword(
+      id,
+      password_baru,
+      password_lama,
+      password_confirm
+    );
+    return response.status(200).json({ message : 'Password Dah bisa dirubah yeyy' });
+  } catch (error) {
+    return next(error);
+  }
+}
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   deleteUser,
+  changePassword,
 };

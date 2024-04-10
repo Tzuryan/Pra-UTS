@@ -66,6 +66,11 @@ async function emailTaken(email){
   const user = await User.findOne({ email });
   return user;
 }
+
+async function updatePassword(id,newpassword){
+  return user.updateOne({ _id: id},{password : newpassword});
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -73,4 +78,5 @@ module.exports = {
   updateUser,
   deleteUser,
   emailTaken,
+  updatePassword,
 };

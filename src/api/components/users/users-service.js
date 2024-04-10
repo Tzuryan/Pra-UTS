@@ -1,5 +1,5 @@
 const usersRepository = require('./users-repository');
-const { hashPassword } = require('../../../utils/password');
+const { hashPassword, passwordMatched } = require('../../../utils/password');
 
 /**
  * Get list of users
@@ -111,6 +111,25 @@ async function emailTaken(email) {
   return await usersRepository.emailTaken(email);
 }
 
+async function changePassword(userId,password_lama,password_baru,password_confirm) {
+  const user = await usersRepository.getUser(userId);
+  if(!user){
+    throw new Error('User Tidak Ditemukan');
+  }
+  const passwordCocok = await passwordMatched(password_lama,user.password);
+  if(!passwordCocok){
+    throw new Error('Password Tidak Sesuai');
+  }
+  if(password_baru !== password_confirm){
+    throw new Error('Password Tidak Sama ');
+  }
+  if(password_baru.length < 6 || password_baru.length > 32){
+    throw new Error('Panjang Password tidak sesuai');
+  }
+  const hashedPasswordBaru = await hashPassword(password_baru);
+  await usersRepository.updatePassword(userId,hashedPasswordBaru);
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -118,4 +137,5 @@ module.exports = {
   updateUser,
   deleteUser,
   emailTaken,
+  changePassword,
 };
